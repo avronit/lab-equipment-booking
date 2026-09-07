@@ -18,3 +18,7 @@ The API rejects overlapping reservations on the same instrument. The React clien
 ## GitHub and hosting later
 
 Recommended topology: Vercel for `client`, Render/Railway/Azure App Service for the .NET API, and Supabase PostgreSQL for the database. The API stays behind an environment variable so local and hosted deployments use the same client code. Add Entra authentication and Graph calendar sync after the core workflow is accepted locally.
+
+## GitHub Pages preview
+
+The `master` branch automatically builds and deploys the Vite client through `.github/workflows/deploy-pages.yml`. In the repository settings, open **Pages**, choose **GitHub Actions** as the source, and then use `https://avronit.github.io/lab-equipment-booking/`. Until the API is hosted, the page is a frontend preview and booking data remains local-only.
