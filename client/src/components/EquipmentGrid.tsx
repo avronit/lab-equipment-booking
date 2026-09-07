@@ -1,0 +1,5 @@
+import { Chip, Paper, Stack, TextField, Typography } from '@mui/material';
+import { useState } from 'react';
+import { Station } from '../types';
+const colors = { Available: 'success', Occupied: 'error', Maintenance: 'warning' } as const;
+export default function EquipmentGrid({ stations }: { stations: Station[] }) { const [query, setQuery] = useState(''); const filtered = stations.filter(s => s.name.toLowerCase().includes(query.toLowerCase())); return <Stack spacing={2}><TextField label="Search equipment" value={query} onChange={e => setQuery(e.target.value)} size="small" sx={{ maxWidth: 360 }} /><div className="equipment-grid">{filtered.map(s => <Paper className="equipment-card" key={s.id} elevation={0}><Typography variant="h6">{s.name}</Typography><Chip label={s.status} color={colors[s.status]} size="small" /></Paper>)}</div></Stack>; }

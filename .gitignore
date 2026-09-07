@@ -1,0 +1,9 @@
+client/node_modules/
+client/dist/
+server/bin/
+server/obj/
+.vscode/
+.env
+.env.*
+appsettings.*.json
+!appsettings.json
