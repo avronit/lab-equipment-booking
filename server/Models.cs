@@ -23,4 +23,10 @@ public sealed class Booking
 }
 
 public sealed record CreateBookingRequest(string UserName, string ExperimentName, string Description, int StationId, DateTime StartDateTime, DateTime EndDateTime);
-public sealed record ReportRow(string Key, int BookingCount, double TotalUsageHours);
+public sealed record ReportRow(
+    string Key,
+    int BookingCount,
+    double TotalUsageHours,
+    string ExperimentName,
+    string Description,
+    string UserName);
