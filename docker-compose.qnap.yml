@@ -8,7 +8,7 @@ services:
       DatabasePassword: ${BOOKIT_DB_PASSWORD}
       ConnectionStrings__DefaultConnection: Host=${NAS_HOST:-lab26-nas};Port=5432;Database=lab_equipment_booking;Username=booking_app;
     ports:
-      - "5000:5000"
+      - "5001:5000"
     restart: unless-stopped
 
   bookit-web:
@@ -17,7 +17,7 @@ services:
       args:
         VITE_API_URL: ${VITE_API_URL}
     ports:
-      - "8080:80"
+      - "8081:80"
     depends_on:
       - bookit-api
     restart: unless-stopped
