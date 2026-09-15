@@ -1,0 +1,24 @@
+services:
+  bookit-api:
+    build:
+      context: /share/Container/bookit-postgres/lab-equipment-booking-master
+      dockerfile: server/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      DatabasePassword: CHANGE_THIS_PASSWORD
+      ConnectionStrings__DefaultConnection: Host=132.72.15.186;Port=5432;Database=lab_equipment_booking;Username=booking_app;
+    ports:
+      - "5050:5000"
+    restart: unless-stopped
+
+  bookit-web:
+    build:
+      context: /share/Container/bookit-postgres/lab-equipment-booking-master/client
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: http://132.72.15.186:5050/api
+    ports:
+      - "8090:80"
+    depends_on:
+      - bookit-api
+    restart: unless-stopped
