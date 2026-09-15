@@ -5,6 +5,7 @@ services:
       dockerfile: server/Dockerfile
     environment:
       ASPNETCORE_ENVIRONMENT: Production
+      UseInMemoryDatabase: "false"
       DatabasePassword: ${BOOKIT_DB_PASSWORD}
       ConnectionStrings__DefaultConnection: Host=${NAS_HOST:-132.72.15.186};Port=5432;Database=lab_equipment_booking;Username=booking_app;
     ports:
