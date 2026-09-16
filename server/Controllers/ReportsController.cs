@@ -8,8 +8,30 @@ public sealed class ReportsController(AppDbContext db) : ControllerBase
 {
     [HttpGet("users")]
     public async Task<ActionResult<IEnumerable<ReportRow>>> Users(DateTime? from = null, DateTime? to = null) => Ok(await BuildReport(db.Bookings, x => x.UserName, from, to));
+
     [HttpGet("stations")]
     public async Task<ActionResult<IEnumerable<ReportRow>>> Stations(DateTime? from = null, DateTime? to = null) => Ok(await BuildReport(db.Bookings.Include(x => x.Station), x => x.Station!.Name, from, to));
+
+    [HttpGet("users/export")]
+    public async Task<IActionResult> ExportUsersCsv(DateTime? from = null, DateTime? to = null)
+    {
+        var rows = await BuildReport(db.Bookings, x => x.UserName, from, to);
+        var filePath = ReportsExportService.SaveCsvToDisk("lab-booking-users-report", rows);
+        var fileName = Path.GetFileName(filePath);
+        var bytes = await System.IO.File.ReadAllBytesAsync(filePath);
+        return File(bytes, "text/csv", fileName);
+    }
+
+    [HttpGet("stations/export")]
+    public async Task<IActionResult> ExportStationsCsv(DateTime? from = null, DateTime? to = null)
+    {
+        var rows = await BuildReport(db.Bookings.Include(x => x.Station), x => x.Station!.Name, from, to);
+        var filePath = ReportsExportService.SaveCsvToDisk("lab-booking-stations-report", rows);
+        var fileName = Path.GetFileName(filePath);
+        var bytes = await System.IO.File.ReadAllBytesAsync(filePath);
+        return File(bytes, "text/csv", fileName);
+    }
+
     private static async Task<List<ReportRow>> BuildReport(IQueryable<Booking> source, Func<Booking, string> key, DateTime? from, DateTime? to)
     {
         var bookings = await source.AsNoTracking().Where(x => (!from.HasValue || x.EndDateTime >= from) && (!to.HasValue || x.StartDateTime <= to)).ToListAsync();

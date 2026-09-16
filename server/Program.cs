@@ -1,12 +1,23 @@
 using LabEquipmentBooking.Api;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-	if (builder.Configuration.GetValue<bool>("UseInMemoryDatabase")) options.UseInMemoryDatabase("LabEquipmentBooking");
-	else options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+	if (builder.Configuration.GetValue<bool>("UseInMemoryDatabase"))
+	{
+		options.UseInMemoryDatabase("LabEquipmentBooking");
+	}
+	else
+	{
+		var connectionString = new NpgsqlConnectionStringBuilder(builder.Configuration.GetConnectionString("DefaultConnection"));
+		var password = builder.Configuration["DatabasePassword"];
+		if (string.IsNullOrWhiteSpace(password)) password = Environment.GetEnvironmentVariable("BOOKIT_DB_PASSWORD");
+		if (!string.IsNullOrWhiteSpace(password)) connectionString.Password = password;
+		options.UseNpgsql(connectionString.ConnectionString);
+	}
 });
 builder.Services.AddCors(options => options.AddDefaultPolicy(policy => policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
 builder.Services.AddControllers().AddJsonOptions(options =>
