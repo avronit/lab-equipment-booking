@@ -6,8 +6,10 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       UseInMemoryDatabase: "false"
-      DatabasePassword: CHANGE_THIS_PASSWORD
-      ConnectionStrings__DefaultConnection: Host=132.72.15.186;Port=5432;Database=lab_equipment_booking;Username=booking_app;
+      DatabasePassword: ${BOOKIT_DB_PASSWORD:?Set BOOKIT_DB_PASSWORD in qnap.env}
+      ConnectionStrings__DefaultConnection: Host=132.72.15.186;Port=5432;Database=lab_equipment_booking;Username=booking_app;Password=${BOOKIT_DB_PASSWORD:?Set BOOKIT_DB_PASSWORD in qnap.env};
+    volumes:
+      - /share/Container/bookit-postgres/exports:/app/exports
     ports:
       - "5050:5000"
     restart: unless-stopped
@@ -17,7 +19,7 @@ services:
       context: /share/Container/bookit-postgres/lab-equipment-booking-master/client
       dockerfile: Dockerfile
       args:
-        VITE_API_URL: http://132.72.15.186:5050/api
+        VITE_API_URL: ${VITE_API_URL:?Set VITE_API_URL in qnap.env}
     ports:
       - "8090:80"
     depends_on:

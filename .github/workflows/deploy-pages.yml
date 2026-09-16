@@ -30,7 +30,14 @@ jobs:
         run: npm ci
         working-directory: client
       - name: Build client
-        run: npm run build:pages
+        run: |
+          if [ -z "$VITE_API_URL" ]; then
+            echo "Repository variable VITE_API_URL must be set to the HTTPS Bookit API URL."
+            exit 1
+          fi
+          npm run build:pages
+        env:
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
         working-directory: client
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

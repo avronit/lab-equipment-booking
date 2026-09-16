@@ -15,6 +15,12 @@ Install Node.js 20+, npm, and the .NET 8 SDK. A local PostgreSQL instance is req
 
 The API rejects overlapping reservations on the same instrument. The React client supports equipment search/status, weekly/monthly calendar views, booking details, delete, and user/equipment Excel/PDF reports.
 
+## QNAP deployment
+
+Copy `qnap.env.example` to `qnap.env` on the NAS and set `BOOKIT_DB_PASSWORD` to the password configured for the `booking_app` PostgreSQL user. Start the stack with `docker compose --env-file qnap.env -f docker-compose.qnap-absolute.yml up -d --build`.
+
+For the GitHub Pages client to save bookings, create a repository variable named `VITE_API_URL` containing an HTTPS API URL such as `https://bookit.example.com/api`. The API must be exposed through an HTTPS reverse proxy on the NAS; a raw HTTP NAS address will be blocked by browsers when the client is loaded from GitHub Pages.
+
 ## GitHub and hosting later
 
 Recommended topology: Vercel for `client`, Render/Railway/Azure App Service for the .NET API, and Supabase PostgreSQL for the database. The API stays behind an environment variable so local and hosted deployments use the same client code. Add Entra authentication and Graph calendar sync after the core workflow is accepted locally.
