@@ -1,0 +1,14 @@
+import { Booking, BookingInput, ReportRow, Station } from './types';
+
+const key = 'lab-equipment-booking-state';
+const defaultStations: Station[] = ['Sensys', 'C80 Calvet', 'Calvet DC', 'Alexsys', 'Themys LV', 'Themys', 'Labsys STA', 'STA449 Jupiter', 'DSC404', 'STA509 Jupiter', 'MicroDSC III', 'MicroDSC VII', 'DSC131', 'LFA467 HyperFlash', 'LFA467 HT HyperFlash', 'LFA427 HT HyperFlash', 'DIL L75 Horizontal', 'DIL L75 Vertical', 'DIL Vertical Combined with TGA-TOM', 'Levitation'].map((name, index) => ({ id: index + 1, name, status: 'Available' }));
+type State = { stations: Station[]; bookings: Booking[] };
+const load = (): State => { try { return JSON.parse(localStorage.getItem(key) ?? '') as State; } catch { return { stations: defaultStations, bookings: [] }; } };
+const save = (state: State) => localStorage.setItem(key, JSON.stringify(state));
+export const getBrowserStations = async () => load().stations;
+export const getBrowserBookings = async () => { const state = load(); return state.bookings.map(booking => ({ ...booking, station: state.stations.find(station => station.id === booking.stationId) })); };
+export const createBrowserBooking = async (input: BookingInput) => { const state = load(); const start = new Date(input.startDateTime).getTime(); const end = new Date(input.endDateTime).getTime(); if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) throw new Error('End time must be after start time.'); if (state.bookings.some(booking => booking.stationId === input.stationId && start < new Date(booking.endDateTime).getTime() && end > new Date(booking.startDateTime).getTime())) throw new Error('This equipment is already reserved for that time.'); const booking: Booking = { ...input, id: state.bookings.reduce((max, current) => Math.max(max, current.id), 0) + 1, station: state.stations.find(station => station.id === input.stationId) }; save({ ...state, bookings: [...state.bookings, booking] }); return booking; };
+export const deleteBrowserBooking = async (id: number) => { const state = load(); save({ ...state, bookings: state.bookings.filter(booking => booking.id !== id) }); };
+const report = async (byStation: boolean): Promise<ReportRow[]> => { const bookings = await getBrowserBookings(); const groups = new Map<string, ReportRow>(); bookings.forEach(booking => { const key = byStation ? booking.station?.name ?? 'Unknown equipment' : booking.userName; const current = groups.get(key) ?? { key, bookingCount: 0, totalUsageHours: 0, experimentName: booking.experimentName, description: booking.description, userName: booking.userName }; current.bookingCount += 1; current.totalUsageHours += (new Date(booking.endDateTime).getTime() - new Date(booking.startDateTime).getTime()) / 3600000; groups.set(key, current); }); return [...groups.values()]; };
+export const getBrowserUserReport = () => report(false);
+export const getBrowserStationReport = () => report(true);
