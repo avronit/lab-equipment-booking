@@ -3,7 +3,8 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "scripts": { "dev": "vite", "build": "tsc -b && vite build", "preview": "vite preview", "build:pages": "tsc -b && vite build" },
+  "main": "electron/main.cjs",
+  "scripts": { "dev": "vite", "build": "tsc -b && vite build", "build:desktop": "set VITE_DESKTOP=1&& tsc -b && vite build", "desktop:dev": "npm run dev -- --host 127.0.0.1", "desktop:package": "npm run build:desktop && electron-builder --dir", "preview": "vite preview", "build:pages": "tsc -b && vite build" },
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
@@ -21,5 +22,6 @@
     "react-router-dom": "^7.1.5",
     "xlsx": "^0.18.5"
   },
-  "devDependencies": { "@types/file-saver": "^2.0.7", "@types/react": "^19.0.8", "@types/react-dom": "^19.0.3", "@vitejs/plugin-react": "^4.4.1", "typescript": "~5.7.2", "vite": "^6.2.0" }
+  "devDependencies": { "@types/file-saver": "^2.0.7", "@types/react": "^19.0.8", "@types/react-dom": "^19.0.3", "@vitejs/plugin-react": "^4.4.1", "electron": "^36.4.0", "electron-builder": "^26.0.12", "typescript": "~5.7.2", "vite": "^6.2.0" },
+  "build": { "appId": "com.avronit.labequipmentbooking", "productName": "Lab Equipment Booking", "directories": { "output": "build" }, "files": ["dist/**/*", "electron/**/*", "package.json"] }
 }
