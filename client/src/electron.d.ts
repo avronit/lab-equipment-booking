@@ -6,6 +6,7 @@ type LocalState = {
 interface Window {
 	bookitLocal: {
 		load: () => Promise<LocalState>;
+		nextBookingId: () => Promise<number>;
 		save: (state: LocalState) => Promise<LocalState>;
 	};
 }

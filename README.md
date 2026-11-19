@@ -13,7 +13,13 @@ Install Node.js 20+, npm, and the .NET 8 SDK. A local PostgreSQL instance is req
 5. Start the client with `cd client; npm install; npm run dev`.
 6. Set `VITE_API_URL` if the API is not at `http://localhost:5000/api`.
 
-The API rejects overlapping reservations on the same instrument. The React client supports equipment search/status, weekly/monthly calendar views, booking details, delete, and user/equipment Excel/PDF reports.
+The API rejects overlapping reservations on the same instrument. The React client supports equipment search/status, weekly/monthly calendar views, editing and deleting bookings, and user/equipment Excel/PDF reports. Select a calendar event to edit its details and save the changes.
+
+## Desktop bookings and Excel
+
+The desktop build uses `Documents\Bookit\bookit-local.json` and updates the existing `Documents\Bookit\booking-data\LAB_EQUIPMENT_ALL_2026.xlsx` workbook. It adds new bookings to the `All bookings` sheet and updates the matching row for an edited booking; it preserves existing rows, the Client and Material columns, and the other sheets. The existing workbook columns record the date and duration, while the calendar keeps the full start and end times. Deleting a calendar booking does not erase its historical Excel row. A backup of the workbook is kept beside it before each update. Close the workbook in Excel before saving; if the workbook is missing, locked, or its matching row differs from the calendar, the save reports an error instead of replacing existing data.
+
+Automatic workbook updates apply to the desktop build, not the GitHub Pages website or the API. Build it on Windows with `npm run desktop:package` in `client` after installing the dependencies. Set `BOOKIT_DATA_DIR` before starting the desktop app to use another directory containing the same JSON and `booking-data` layout. The website retains its existing browser-local or API storage and report exports.
 
 ## QNAP deployment
 

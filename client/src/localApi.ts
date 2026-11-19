@@ -1,4 +1,5 @@
 import { Booking, BookingInput, ReportRow, Station } from './types';
+import { updateBookingState, validateBooking } from './bookingState';
 
 const load = () => window.bookitLocal.load();
 const save = (state: { stations: Station[]; bookings: Booking[] }) => window.bookitLocal.save(state);
@@ -11,13 +12,15 @@ export const getLocalBookings = async () => {
 
 export const createLocalBooking = async (input: BookingInput) => {
 	const state = await load();
-	const start = new Date(input.startDateTime).getTime();
-	const end = new Date(input.endDateTime).getTime();
-	if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) throw new Error('End time must be after start time.');
-	if (state.bookings.some(booking => booking.stationId === input.stationId && start < new Date(booking.endDateTime).getTime() && end > new Date(booking.startDateTime).getTime())) throw new Error('This equipment is already reserved for that time.');
-	const booking: Booking = { ...input, id: state.bookings.reduce((max, current) => Math.max(max, current.id), 0) + 1, station: state.stations.find(station => station.id === input.stationId) };
+	validateBooking(state, input);
+	const booking: Booking = { ...input, id: await window.bookitLocal.nextBookingId(), station: state.stations.find(station => station.id === input.stationId) };
 	await save({ ...state, bookings: [...state.bookings, booking] });
 	return booking;
+};
+
+export const updateLocalBooking = async (id: number, input: BookingInput) => {
+	const state = updateBookingState(await load(), id, input);
+	await save(state);
 };
 
 export const deleteLocalBooking = async (id: number) => {

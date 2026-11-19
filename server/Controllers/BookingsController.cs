@@ -29,6 +29,8 @@ public sealed class BookingsController(AppDbContext db) : ControllerBase
         var booking = await db.Bookings.FindAsync(id); if (booking is null) return NotFound();
         var startDateTime = ToUtc(request.StartDateTime);
         var endDateTime = ToUtc(request.EndDateTime);
+        if (endDateTime <= startDateTime) return BadRequest("End date/time must be after the start date/time.");
+        if (!await db.Stations.AnyAsync(x => x.Id == request.StationId)) return BadRequest("Equipment was not found.");
         var conflict = await db.Bookings.AnyAsync(x => x.Id != id && x.StationId == request.StationId && startDateTime < x.EndDateTime && endDateTime > x.StartDateTime);
         if (conflict) return Conflict("This instrument is already reserved during the selected time.");
         booking.UserName = request.UserName; booking.ExperimentName = request.ExperimentName; booking.Description = request.Description; booking.StationId = request.StationId; booking.StartDateTime = startDateTime; booking.EndDateTime = endDateTime;

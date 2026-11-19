@@ -1,13 +1,14 @@
 import axios from 'axios';
 import { Booking, BookingInput, ReportRow, Station } from './types';
-import { createLocalBooking, deleteLocalBooking, getLocalBookings, getLocalStationReport, getLocalStations, getLocalUserReport } from './localApi';
-import { createBrowserBooking, deleteBrowserBooking, getBrowserBookings, getBrowserStationReport, getBrowserStations, getBrowserUserReport } from './browserApi';
+import { createLocalBooking, deleteLocalBooking, getLocalBookings, getLocalStationReport, getLocalStations, getLocalUserReport, updateLocalBooking } from './localApi';
+import { createBrowserBooking, deleteBrowserBooking, getBrowserBookings, getBrowserStationReport, getBrowserStations, getBrowserUserReport, updateBrowserBooking } from './browserApi';
 const api = axios.create({ baseURL: import.meta.env.VITE_API_URL ?? 'http://localhost:5000/api' });
 const local = import.meta.env.VITE_DESKTOP === '1';
 const browserLocal = !import.meta.env.VITE_API_URL;
 export const getStations = () => local ? getLocalStations() : browserLocal ? getBrowserStations() : api.get<Station[]>('/stations').then(r => r.data);
 export const getBookings = () => local ? getLocalBookings() : browserLocal ? getBrowserBookings() : api.get<Booking[]>('/bookings').then(r => r.data);
 export const createBooking = (input: BookingInput) => local ? createLocalBooking(input) : browserLocal ? createBrowserBooking(input) : api.post<Booking>('/bookings', input).then(r => r.data);
+export const updateBooking = (id: number, input: BookingInput) => local ? updateLocalBooking(id, input) : browserLocal ? updateBrowserBooking(id, input) : api.put(`/bookings/${id}`, input).then(() => undefined);
 export const deleteBooking = (id: number) => local ? deleteLocalBooking(id) : browserLocal ? deleteBrowserBooking(id) : api.delete(`/bookings/${id}`);
 export const getUserReport = () => local ? getLocalUserReport() : browserLocal ? getBrowserUserReport() : api.get<ReportRow[]>('/reports/users').then(r => r.data);
 export const getStationReport = () => local ? getLocalStationReport() : browserLocal ? getBrowserStationReport() : api.get<ReportRow[]>('/reports/stations').then(r => r.data);
